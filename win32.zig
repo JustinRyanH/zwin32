@@ -21,12 +21,15 @@ const win32 = std.os.windows;
 
 pub const BOOL = win32.BOOL;
 pub const DWORD = win32.DWORD;
+pub const COLORREF = win32.DWORD;
 pub const HBRUSH = win32.HBRUSH;
 pub const HCURSOR = win32.HCURSOR;
 pub const HICON = win32.HICON;
 pub const HDC = win32.HDC;
 pub const HMODULE = win32.HMODULE;
 pub const HFONT = *@Type(.Opaque);
+pub const HGDIOBJ = *@Type(.Opaque);
+pub const HBITMAP = *@Type(.Opaque);
 pub const HINSTANCE = win32.HINSTANCE;
 pub const HMENU = win32.HMENU;
 pub const HWND = win32.HWND;
@@ -401,6 +404,8 @@ pub const VK_NONAME = 0xFC;
 pub const VK_PA1 = 0xFD;
 pub const VK_OEM_CLEAR = 0xFE;
 
+// GDI Bits
+
 pub const DIB_RGB_COLORS = 0;
 pub const DIB_PAL_COLORS = 1;
 
@@ -419,6 +424,90 @@ pub const PATINVERT: DWORD = 0x005A0049;
 pub const DSTINVERT: DWORD = 0x00550009;
 pub const BLACKNESS: DWORD = 0x00000042;
 pub const WHITENESS: DWORD = 0x00FF0062;
+
+pub const ETO_OPAQUE = 0x0002;
+pub const ETO_CLIPPED = 0x0004;
+pub const ETO_GLYPH_INDEX = 0x0010;
+pub const ETO_RTLREADING = 0x0080;
+pub const ETO_NUMERICSLOCAL = 0x0400;
+pub const ETO_NUMERICSLATIN = 0x0800;
+pub const ETO_IGNORELANGUAGE = 0x1000;
+pub const ETO_PDY = 0x2000;
+pub const ETO_REVERSE_INDEX_MAP = 0x10000;
+
+// /* Stock Logical Objects */
+pub const WHITE_BRUSH = 0;
+pub const LTGRAY_BRUSH = 1;
+pub const GRAY_BRUSH = 2;
+pub const DKGRAY_BRUSH = 3;
+pub const BLACK_BRUSH = 4;
+pub const NULL_BRUSH = 5;
+pub const HOLLOW_BRUSH = NULL_BRUSH;
+pub const WHITE_PEN = 6;
+pub const BLACK_PEN = 7;
+pub const NULL_PEN = 8;
+pub const OEM_FIXED_FONT = 10;
+pub const ANSI_FIXED_FONT = 11;
+pub const ANSI_VAR_FONT = 12;
+pub const SYSTEM_FONT = 13;
+pub const DEVICE_DEFAULT_FONT = 14;
+pub const DEFAULT_PALETTE = 15;
+pub const SYSTEM_FIXED_FONT = 16;
+
+pub const DEFAULT_GUI_FONT = 17;
+pub const DC_BRUSH = 18;
+pub const DC_PEN = 19;
+pub const STOCK_LAST = 19;
+pub const CLR_INVALID = 0xFFFFFFFF;
+pub const BS_SOLID = 0;
+pub const BS_NULL = 1;
+pub const BS_HOLLOW = BS_NULL;
+pub const BS_HATCHED = 2;
+pub const BS_PATTERN = 3;
+pub const BS_INDEXED = 4;
+pub const BS_DIBPATTERN = 5;
+pub const BS_DIBPATTERNPT = 6;
+pub const BS_PATTERN8X8 = 7;
+pub const BS_DIBPATTERN8X8 = 8;
+pub const BS_MONOPATTERN = 9;
+// -----
+pub const HS_HORIZONTAL = 0;
+// |||||
+pub const HS_VERTICAL = 1;
+// \\\\\
+pub const HS_FDIAGONAL = 2;
+// /////
+pub const HS_BDIAGONAL = 3;
+// +++++
+pub const HS_CROSS = 4;
+// xxxxx
+pub const HS_DIAGCROSS = 5;
+pub const HS_API_MAX = 12;
+pub const PS_SOLID = 0;
+// -------
+pub const PS_DASH = 1;
+// .......
+pub const PS_DOT = 2;
+// _._._._
+pub const PS_DASHDOT = 3;
+// _.._.._
+pub const PS_DASHDOTDOT = 4;
+pub const PS_NULL = 5;
+pub const PS_INSIDEFRAME = 6;
+pub const PS_USERSTYLE = 7;
+pub const PS_ALTERNATE = 8;
+pub const PS_STYLE_MASK = 0x0000000F;
+pub const PS_ENDCAP_ROUND = 0x00000000;
+pub const PS_ENDCAP_SQUARE = 0x00000100;
+pub const PS_ENDCAP_FLAT = 0x00000200;
+pub const PS_ENDCAP_MASK = 0x00000F00;
+pub const PS_JOIN_ROUND = 0x00000000;
+pub const PS_JOIN_BEVEL = 0x00001000;
+pub const PS_JOIN_MITER = 0x00002000;
+pub const PS_JOIN_MASK = 0x0000F000;
+pub const PS_COSMETIC = 0x00000000;
+pub const PS_GEOMETRIC = 0x00010000;
+pub const PS_TYPE_MASK = 0x000F0000;
 
 // Function Definitions
 pub const WNDPROC = fn (HWND, UINT, WPARAM, LPARAM) callconv(.Stdcall) LRESULT;
@@ -440,7 +529,16 @@ pub extern "kernel32" fn LoadLibraryA([*:0]const u8) ?HMODULE;
 
 pub extern "gdi32" fn StretchDIBits(hdc: HDC, xDest: i32, yDest: i32, DestWidth: i32, DestHeight: i32, xSrc: i32, ySrc: i32, SrcWidth: i32, SrcHeight: i32, lpBits: *c_void, lpbmi: *BITMAPINFO, iUsage: UINT, rop: DWORD) i32;
 pub extern "gdi32" fn PatBlt(hdc: HDC, x: c_int, y: c_int, w: c_int, h: c_int, rop: DWORD) BOOL;
-pub extern "gdi32" fn CreateCompatibleDC(hdc: ?HDC) HDC;
+pub extern "gdi32" fn CreateCompatibleDC(hdc: ?HDC) ?HDC;
+pub extern "gdi32" fn CreateCompatibleBitmap(hdc: ?HDC, x: c_int, y: c_int) ?HDC;
+pub extern "gdi32" fn SetBkColor(hdc: HDC, color: COLORREF) COLORREF;
+pub extern "gdi32" fn ExtTextOutA(hdc: HDC, x: c_int, y: c_int, options: c_uint, rect: *const RECT, lpString: ?LPCSTR, c: c_uint, dx: ?*const c_int) COLORREF;
+pub extern "gdi32" fn SetDCPenColor(hdc: HDC, color: COLORREF) COLORREF;
+pub extern "gdi32" fn SetDCBrushColor(hdc: HDC, color: COLORREF) COLORREF;
+pub extern "gdi32" fn RoundRect(hdc: HDC, left: c_int, top: c_int, right: c_int, bottom: c_int, width: c_int, height: c_int) bool;
+pub extern "gdi32" fn SelectObject(hdc: HDC, obj: HGDIOBJ) HGDIOBJ;
+pub extern "gdi32" fn DeleteObject(obj: HGDIOBJ) bool;
+pub extern "gdi32" fn GetStockObject(index: c_int) HGDIOBJ;
 
 // Minimum timer resolution, in milliseconds, for the application or device driver. A lower value specifies a higher (more accurate) resolution.
 pub extern "Winmm" fn timeBeginPeriod(u32) u32;
