@@ -27,9 +27,9 @@ pub const HCURSOR = win32.HCURSOR;
 pub const HICON = win32.HICON;
 pub const HDC = win32.HDC;
 pub const HMODULE = win32.HMODULE;
-pub const HFONT = *@Type(.Opaque);
 pub const HGDIOBJ = *@Type(.Opaque);
-pub const HBITMAP = *@Type(.Opaque);
+pub const HFONT = HGDIOBJ;
+pub const HBITMAP = HGDIOBJ;
 pub const HINSTANCE = win32.HINSTANCE;
 pub const HMENU = win32.HMENU;
 pub const HWND = win32.HWND;
@@ -529,16 +529,18 @@ pub extern "kernel32" fn LoadLibraryA([*:0]const u8) ?HMODULE;
 
 pub extern "gdi32" fn StretchDIBits(hdc: HDC, xDest: i32, yDest: i32, DestWidth: i32, DestHeight: i32, xSrc: i32, ySrc: i32, SrcWidth: i32, SrcHeight: i32, lpBits: *c_void, lpbmi: *BITMAPINFO, iUsage: UINT, rop: DWORD) i32;
 pub extern "gdi32" fn PatBlt(hdc: HDC, x: c_int, y: c_int, w: c_int, h: c_int, rop: DWORD) BOOL;
+pub extern "gdi32" fn BitBlt(hdc: HDC, x: c_int, y: c_int, cx: c_int, cy: c_int, src: HDC, x1: c_int, y1: c_int, rop: DWORD) BOOL;
+
 pub extern "gdi32" fn CreateCompatibleDC(hdc: ?HDC) ?HDC;
-pub extern "gdi32" fn CreateCompatibleBitmap(hdc: ?HDC, x: c_int, y: c_int) ?HDC;
+pub extern "gdi32" fn CreateCompatibleBitmap(hdc: ?HDC, x: c_int, y: c_int) ?HBITMAP;
 pub extern "gdi32" fn SetBkColor(hdc: HDC, color: COLORREF) COLORREF;
 pub extern "gdi32" fn ExtTextOutA(hdc: HDC, x: c_int, y: c_int, options: c_uint, rect: *const RECT, lpString: ?LPCSTR, c: c_uint, dx: ?*const c_int) COLORREF;
 pub extern "gdi32" fn SetDCPenColor(hdc: HDC, color: COLORREF) COLORREF;
 pub extern "gdi32" fn SetDCBrushColor(hdc: HDC, color: COLORREF) COLORREF;
 pub extern "gdi32" fn RoundRect(hdc: HDC, left: c_int, top: c_int, right: c_int, bottom: c_int, width: c_int, height: c_int) bool;
-pub extern "gdi32" fn SelectObject(hdc: HDC, obj: HGDIOBJ) HGDIOBJ;
+pub extern "gdi32" fn SelectObject(hdc: HDC, obj: HGDIOBJ) ?HGDIOBJ;
 pub extern "gdi32" fn DeleteObject(obj: HGDIOBJ) bool;
-pub extern "gdi32" fn GetStockObject(index: c_int) HGDIOBJ;
+pub extern "gdi32" fn GetStockObject(index: c_int) callconv(.C) ?HGDIOBJ;
 
 // Minimum timer resolution, in milliseconds, for the application or device driver. A lower value specifies a higher (more accurate) resolution.
 pub extern "Winmm" fn timeBeginPeriod(u32) u32;
