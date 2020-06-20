@@ -542,6 +542,7 @@ pub extern "gdi32" fn ExtTextOutA(hdc: HDC, x: c_int, y: c_int, options: c_uint,
 pub extern "gdi32" fn SetDCPenColor(hdc: HDC, color: COLORREF) COLORREF;
 pub extern "gdi32" fn SetDCBrushColor(hdc: HDC, color: COLORREF) COLORREF;
 pub extern "gdi32" fn RoundRect(hdc: HDC, left: c_int, top: c_int, right: c_int, bottom: c_int, width: c_int, height: c_int) bool;
+pub extern "gdi32" fn Rectangle(hdc: HDC, left: c_int, top: c_int, right: c_int, bottom: c_int) bool;
 pub extern "gdi32" fn SelectObject(hdc: HDC, obj: HGDIOBJ) ?HGDIOBJ;
 pub extern "gdi32" fn CreatePen(style: c_int, width: c_int, color: COLORREF) HPEN;
 pub extern "gdi32" fn DeleteObject(obj: HGDIOBJ) bool;
