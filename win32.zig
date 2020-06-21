@@ -549,6 +549,7 @@ pub extern "gdi32" fn DeleteObject(obj: HGDIOBJ) bool;
 pub extern "gdi32" fn GetStockObject(index: c_int) callconv(.C) ?HGDIOBJ;
 pub extern "gdi32" fn MoveToEx(hdc: HDC, x: c_int, y: c_int, point: ?*POINT) bool;
 pub extern "gdi32" fn LineTo(hdc: HDC, x: c_int, y: c_int) bool;
+pub extern "gdi32" fn Polygon(hdc: HDC, apt: *const POINT, cpt: c_int) bool;
 
 // Minimum timer resolution, in milliseconds, for the application or device driver. A lower value specifies a higher (more accurate) resolution.
 pub extern "Winmm" fn timeBeginPeriod(u32) u32;
