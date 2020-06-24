@@ -27,6 +27,7 @@ pub const HCURSOR = win32.HCURSOR;
 pub const HICON = win32.HICON;
 pub const HDC = win32.HDC;
 pub const HMODULE = win32.HMODULE;
+pub const HRGN = *@Type(.Opaque);
 
 pub const HGDIOBJ = *@Type(.Opaque);
 pub const HFONT = HGDIOBJ;
@@ -550,6 +551,10 @@ pub extern "gdi32" fn GetStockObject(index: c_int) callconv(.C) ?HGDIOBJ;
 pub extern "gdi32" fn MoveToEx(hdc: HDC, x: c_int, y: c_int, point: ?*POINT) bool;
 pub extern "gdi32" fn LineTo(hdc: HDC, x: c_int, y: c_int) bool;
 pub extern "gdi32" fn Polygon(hdc: HDC, apt: *const POINT, cpt: c_int) bool;
+pub extern "gdi32" fn SelectClipRgn(dc: HDC, region: ?HRGN) c_int;
+pub extern "gdi32" fn IntersectClipRect(dc: HDC, left: c_int, top: c_int, right: c_int, bottom: c_int) c_int;
+pub extern "gdi32" fn Ellipse(dc: HDC, left: c_int, top: c_int, right: c_int, bottom: c_int) bool;
+pub extern "gdi32" fn PolyBezier(dc: HDC, points: *const POINT, point_count: DWORD) bool;
 
 // Minimum timer resolution, in milliseconds, for the application or device driver. A lower value specifies a higher (more accurate) resolution.
 pub extern "Winmm" fn timeBeginPeriod(u32) u32;
